@@ -24,8 +24,8 @@ class GAN():
     def __init__(self):
 
         #RGB image as an input
-        self.img_rows = 28 
-        self.img_cols = 28
+        self.img_rows = 128 
+        self.img_cols = 128
         self.channels = 3
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
 
@@ -130,10 +130,11 @@ class GAN():
     def train(self, epochs, batch_size=128, save_interval=50):
         
         # Directory where the face images are stored
-        data_dir = './data_face'
+        # data_dir = './data_face'
+        data_dir = './balloon_patches'
 
         # Input the images from the directory
-        X_train = self.get_batch(glob(os.path.join(data_dir, '*.jpg'))[:5000], 28, 28, 'RGB')
+        X_train = self.get_batch(glob(os.path.join(data_dir, '*.png'))[:5000], self.img_rows, self.img_cols, 'RGB')
         
 
         #Rescale -1 to 1

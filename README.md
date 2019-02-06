@@ -16,3 +16,10 @@ Download the dataset from the provided link and save the images to a folder name
 Create another foler in the same directory named 'output_images' to store the generated images
 
 Run the script
+
+
+### Notes to run from beeekey
+
+* create folder with input data in top directory and edit it in line 134
+* create folder "output_images" to save newly created images
+* added defined image size of class to train method --> defining size of input and output images once in the main class
