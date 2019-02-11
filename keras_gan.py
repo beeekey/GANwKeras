@@ -18,6 +18,7 @@ import os
 from PIL import Image
 from glob import glob
 
+import time, datetime
 import numpy as np
 
 class GAN():
@@ -28,6 +29,7 @@ class GAN():
         self.img_cols = 128
         self.channels = 3
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
+        self.output_folder = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d_%H-%M-%S'))
 
         # optimizer = Adam(lr=0.0002, beta_1=0.5, beta_2=0.999)
         # optimizer = SGD(lr=0.01, momentum=0.5)
@@ -196,6 +198,9 @@ class GAN():
             if epoch % save_interval == 0:
                 self.save_imgs(epoch)
 
+            if epoch % 500 == 0:
+                self.save_fullsized_imgs(epoch)
+
 
         d_loss_logs_r_a = np.array(d_loss_logs_r)
         d_loss_logs_f_a = np.array(d_loss_logs_f)
@@ -214,6 +219,9 @@ class GAN():
                     
 
     def save_imgs(self, epoch):
+        if not os.path.exists("output_images/{}".format(self.output_folder)):
+            os.mkdir("output_images/{}".format(self.output_folder))
+
         r, c = 5, 5
         noise = np.random.normal(0, 1, (r * c, 100))
         gen_imgs = self.generator.predict(noise)
@@ -229,10 +237,36 @@ class GAN():
                 axs[i,j].imshow(gen_imgs[cnt, :,:,:])
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig("output_images/%d.png" % epoch)
+        fig.savefig("output_images/{}/{}.png".format(self.output_folder, epoch))
         plt.close()
 
 
+    def save_fullsized_imgs(self, epoch):
+        if not os.path.exists("output_images/{}/{}".format(self.output_folder, epoch)):
+            os.mkdir("output_images/{}/{}".format(self.output_folder, epoch))
+
+        r, c = 5, 5
+        noise = np.random.normal(0, 1, (r * c, 100))
+        gen_imgs = self.generator.predict(noise)
+
+        # Rescale images 0 - 1
+        gen_imgs = (1/2.5) * gen_imgs + 0.5
+        
+        cnt = 0
+        for i in range(r):
+            for j in range(c):
+                plt.clf()
+                plt.axis("off")
+                plt.imshow(gen_imgs[cnt, :,:,:])
+                filename = ("output_images/{}/{}/{}_{}.png".format(self.output_folder, epoch, epoch, cnt))
+                plt.savefig(filename,
+                            dpi=300,
+                            bbox_inches='tight', 
+                            transparent=False,
+                            pad_inches=0)
+                cnt += 1
+                plt.close()
+
 if __name__ == '__main__':
     gan = GAN()
-    gan.train(epochs=5000, batch_size=32, save_interval=200)
+    gan.train(epochs=500000, batch_size=32, save_interval=200)
